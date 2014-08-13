@@ -298,6 +298,12 @@ Vec2.prototype = {
 		return this.x * v.x + this.y * v.y;
 
 	},
+	
+	cross : function ( v ){
+		
+		return this.x * v.y - this.y * v.x;
+		
+	},
 
 	lengthSq: function () {
 
@@ -394,6 +400,21 @@ Vec2.prototype = {
 		var ny = this.x*sin+this.y*cos;
 		this.x = nx;
 		this.y = ny;
+		return this;
+	},
+	
+	getAngle : function (){
+		var ratio = this.y/this.x;
+		
+		if(this.x >= 0){
+			if(this.y >= 0)
+				return Math.atan(ratio);
+			else
+				return Math.atan(ratio)+Math.PI*2;
+		}
+		else{
+			return Math.atan(ratio)+Math.PI;
+		}
 	},
 
 };

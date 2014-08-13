@@ -4,11 +4,14 @@ function Game(width, height, canvas){
 
 	canvas.width = width;
 	canvas.height = height;
-	$(canvas).center();
+	
+	canvas.style.position = "absolute";
+	canvas.style.left = (window.innerWidth - width)/2 + "px";
+	canvas.style.top = (window.innerHeight - height)/2 + "px";
 
 	this.renderer = new CanvasRenderer(this.width, this.height, canvas);
 	this.loader = new Loader();
-	this.tweens = new TweenManager();
+	
 	this.world = new World({
 		width: this.width,
 		height: this.height,

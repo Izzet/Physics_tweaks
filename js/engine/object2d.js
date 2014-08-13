@@ -5,9 +5,11 @@ function Object2D(options){
 	this.velocity = this.options.velocity === undefined ? new Vec2() : this.options.velocity;
 	this.acceleration = this.options.acceleration === undefined ? new Vec2() : this.options.acceleration;
 	this.friction = this.options.friction === undefined ? new Vec2() : this.options.friction;
+	this.angularFriction = this.options.angularFriction === undefined ? 0 : this.options.angularFriction;
 	this.gravity = this.options.gravity === undefined ? new Vec2() : this.options.gravity;
 	this.rotation = this.options.rotation === undefined ? 0 : this.options.rotation;
 	this.angularVelocity = this.options.angularVelocity === undefined ? 0 : this.options.angularVelocity;
+	this.angularAcceleration = this.options.angularAcceleration === undefined ? 0 : this.options.angularAcceleration;
 	this.width = this.options.width === undefined ? 1 : this.options.width;
 	this.height = this.options.height === undefined ? 1 : this.options.height;
 	this.texture = this.options.texture === undefined ? false : this.options.texture;
@@ -38,13 +40,19 @@ Object2D.prototype.tick = function(dt) {
 
 	this.position.x += this.velocity.x*dt;
 	this.position.y += this.velocity.y*dt;
+	
+	this.angularVelocity -= this.angularVelocity*Math.abs(this.angularVelocity)*this.angularFriction*dt;
+	
+	this.angularVelocity += this.angularAcceleration*dt;
+	this.rotation += this.angularVelocity*dt;
 
 	for (var i = 0; i < this.children.length; i++) {
 		var child = this.children[i];
 		child.tick(dt);
 	}
 
-	this.acceleration.set(0, 0);
+	this.acceleration.set(0,0);
+	this.angularAcceleration = 0;
 };
 
 Object2D.prototype.render = function(ctx) {
