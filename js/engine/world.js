@@ -12,7 +12,7 @@ World.prototype.tick = function(dt) {
 
 	this.camera.tick(dt);
 
-	this.checkChildrenCollisions();
+	this.checkChildrenCollisions(dt);
 };
 
 World.prototype.render = function(ctx) {

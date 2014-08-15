@@ -26,7 +26,7 @@ function Object2D(options){
 	this.mouseControls = {};
 }
 
-Object2D.prototype.onCollision = function(){};
+Object2D.prototype.onCollision = function(child,dt){};
 
 Object2D.prototype.tick = function(dt) {
 	this.acceleration.add(this.gravity);
@@ -125,14 +125,14 @@ Object2D.prototype.checkRectangleCollision = function(object) {
 	return !(objectLeft > thisRight || objectRight < thisLeft || objectTop > thisBottom || objectBottom < thisTop);
 };
 
-Object2D.prototype.checkChildrenCollisions = function() {
+Object2D.prototype.checkChildrenCollisions = function(dt) {
 	for(var i=0; i<this.children.length-1; i++){
 		for(var j=i+1; j<this.children.length; j++){
 			if(this.children[i].colliding && this.children[j].colliding){
 				var collision = this.children[i].checkRectangleCollision(this.children[j]);
 				if(collision){
-					this.children[i].onCollision(this.children[j]);
-					this.children[j].onCollision(this.children[i]);
+					this.children[i].onCollision(this.children[j],dt);
+					this.children[j].onCollision(this.children[i],dt);
 				}
 			}
 		}
