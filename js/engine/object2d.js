@@ -106,7 +106,7 @@ Object2D.prototype.removeChildren = function() {
 Object2D.prototype.pointIn = function (x,y){
 	var vec = new Vec2(x-this.position.x, y-this.position.y);
 	vec.rotate(-this.rotation);
-	return (vec.x >= -this.width/2 && vec.x <= this.width/2) && (vec.y >= -this.height/2 && vec.y <= this.height/2);
+	return (vec.x > -this.width/2 && vec.x < this.width/2) && (vec.y > -this.height/2 && vec.y < this.height/2);
 };
 
 Object2D.prototype.checkRectangleCollision = function(object) {

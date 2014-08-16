@@ -32,15 +32,24 @@ PhysicsRectangle.prototype.render = function(ctx){
 		ctx.restore();
 	}
 	Object2D.prototype.render.call(this, ctx);
-	if(this.forces[0]){
+	if(this.forces.length){
 		ctx.save();
-		ctx.beginPath();
 		ctx.translate(this.position.x, this.position.y);
-		var v = this.forces[0].point.clone().rotate(this.rotation);
-		ctx.moveTo(v.x,v.y);
-		ctx.lineTo(this.forces[0].force.x,this.forces[0].force.y);
-		ctx.closePath();
-		ctx.stroke();
+		var v;
+		for(var i = 0; i < this.forces.length; i++){
+			v = this.forces[i].point.clone().rotate(this.rotation);
+			ctx.beginPath();
+			ctx.arc(v.x,v.y,5,0,Math.PI*2);
+			ctx.stroke();
+			ctx.closePath();
+			if(this.forces[i].force.x == 0 && this.forces[i].force.y == 0)
+				continue;
+			ctx.beginPath();
+			ctx.moveTo(v.x,v.y);
+			ctx.lineTo(this.forces[i].force.x,this.forces[i].force.y);
+			ctx.stroke();
+			ctx.closePath();
+		};
 		ctx.restore();
 	}
 };
@@ -77,12 +86,7 @@ PhysicsRectangle.prototype.checkRectangleCollision = function(object){
 		return false;
 	if(object instanceof PhysicsRectangle){
 		var podminka = false;
-		var rotVec;
-		var vec;
-		var pointVelocity;
-		var points;
-		var w;
-		var v;
+		var vec, rotVec, velocity, pointVelocity, points, w, v;
 		var objects = [
 			[
 				this,
@@ -104,10 +108,11 @@ PhysicsRectangle.prototype.checkRectangleCollision = function(object){
 				rotVec = objects[n][1].multiply(points[i]);
 				vec = rotVec.add(objects[n][0].position);
 				if(objects[1-n][0].pointIn(vec.x,vec.y)){
-					w = objects[n][0].angularVelocity;
-					v = objects[n][0].velocity;
-					pointVelocity = new Vec2(-w*rotVec.y + v.x, w*rotVec.x + v.y);
-					objects[1-n][0].collisionPoints.push([vec, pointVelocity]);
+					w = objects[n][0].angularVelocity-objects[1-n][0].angularVelocity;
+					v = objects[n][0].velocity.clone().sub(objects[1-n][0].velocity);
+					// !!! předělat na relativní rychlost vzhledem k druhému objektu
+					pointVelocity = new Vec2(-w*points[i].rotate(objects[n][0].rotation).y + v.x, w*points[i].rotate(objects[n][0].rotation).x + v.y);
+					objects[n][0].collisionPoints.push([vec.sub(objects[n][0].position).rotate(-objects[n][0].rotation), pointVelocity]);
 					podminka = true;
 				}
 			};
@@ -118,28 +123,40 @@ PhysicsRectangle.prototype.checkRectangleCollision = function(object){
 
 PhysicsRectangle.prototype.onCollision = function (object, dt){
 	object.rotation -= object.angularVelocity*dt;
-	object.position.sub( object.velocity.multiplyScalar(dt) );
+	object.position.sub( object.velocity.clone().multiplyScalar(dt) );
 	object.stopMotion();
 	
 	this.rotation -= this.angularVelocity*dt;
-	this.position.sub( this.velocity.multiplyScalar(dt) );
+	this.position.sub( this.velocity.clone().multiplyScalar(dt) );
 	this.stopMotion();
 	/*var _this = this;
 	if(this.collisionPoints.length < 1)
 		return;
-	console.log(this.collisionPoints);
 	var v;
 	for(var i = 0; i < this.collisionPoints.length; i++){
+		if(this.color == "#f00")
+			console.log(_this.collisionPoints[i][0]);
 		this.forces.push({
 			point : _this.collisionPoints[i][0],
-			force : _this.collisionPoints[i][1].multiplyScalar(0.02*object.mass/dt),
+			force : _this.collisionPoints[i][1].multiplyScalar(_this.mass/dt),
 		});
-		v = _this.collisionPoints[i][0].add(this.position);
+		v = this.collisionPoints[i][0].clone().rotate(this.rotation);
+		v.add(this.position);
 		v.sub(object.position);
+		v.rotate(-object.rotation);
 		object.forces.push({
 			point : v,
-			force : _this.collisionPoints[i][1].multiplyScalar(-0.02*object.mass/dt),
+			force : _this.collisionPoints[i][1].multiplyScalar(object.mass/dt),
 		});
 	};*/
+	
+	/*var objects = [this, object];
+	var harmonicMass = 2*this.mass*object.mass/(this.mass+object.mass);
+	var harmonicInertia = 2*this.inertiaMoment*object.inertiaMoment/(this.inertiaMoment+object.inertiaMoment);
+	for(var i = 0; i < 2; i++){
+		objects[i].velocity.add(objects[1-i].velocity.clone().sub(objects[i].velocity).multiplyScalar(harmonicMass));
+		objects[i].angularVelocity += (objects[1-i].angularVelocity-objects[i].angularVelocity)*harmonicInertia;
+	};
+	*/
 	this.collisionPoints = [];
 };
