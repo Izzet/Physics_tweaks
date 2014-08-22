@@ -103,10 +103,11 @@ Object2D.prototype.removeChildren = function() {
 	this.children = [];
 };
 
-Object2D.prototype.pointIn = function (x,y){
-	var vec = new Vec2(x-this.position.x, y-this.position.y);
+Object2D.prototype.pointIn = function ( v ){ 
+	var vec = v.clone();//new Vec2(v.x, v.y);
+	vec.sub(this.position);
 	vec.rotate(-this.rotation);
-	return (vec.x > -this.width/2 && vec.x < this.width/2) && (vec.y > -this.height/2 && vec.y < this.height/2);
+	return (vec.x >= -this.width/2 && vec.x <= this.width/2) && (vec.y >= -this.height/2 && vec.y <= this.height/2);
 };
 
 Object2D.prototype.checkRectangleCollision = function(object) {
@@ -129,7 +130,7 @@ Object2D.prototype.checkChildrenCollisions = function(dt) {
 	for(var i=0; i<this.children.length-1; i++){
 		for(var j=i+1; j<this.children.length; j++){
 			if(this.children[i].colliding && this.children[j].colliding){
-				var collision = this.children[i].checkRectangleCollision(this.children[j]);
+				var collision = this.children[i].checkRectangleCollision(this.children[j], dt);
 				if(collision){
 					this.children[i].onCollision(this.children[j],dt);
 					this.children[j].onCollision(this.children[i],dt);

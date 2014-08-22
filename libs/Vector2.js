@@ -416,5 +416,32 @@ Vec2.prototype = {
 			return Math.atan(ratio)+Math.PI;
 		}
 	},
+	
+	getQuadrant : function (){
+		if(this.x >= 0 && this.y >=0)
+			return 1;
+		if(this.x <=0 && this.y > 0)
+			return 2;
+		if(this.x <= 0 && this.y < 0)
+			return 3;
+		else return 4;
+		return NaN;
+	},
+	
+	getProjections : function ( v ){
+		var vec1, vec2;
+		if(v.x != 0 || v.y != 0){
+			var a = v.getAngle();
+			var _this = this.clone().rotate(-a);
+			vec1 = new Vec2(_this.x, 0).rotate(a);
+			vec2 = new Vec2(0,_this.y).rotate(a);
+		}
+		else{
+			vec1 = this.clone();
+			vec2 = new Vec2();
+		}
+		
+		return [vec1, vec2];
+	},
 
 };

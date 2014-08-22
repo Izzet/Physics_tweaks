@@ -12,12 +12,12 @@ function GUILabel(options){
 	this.mouseIN = false;
 	var _this = this;
 	this.addMouseControl(1,function(x,y,type){
-		if(_this.pointIn(x,y))
+		if(_this.pointIn(new Vec2(x,y)))
 			_this.onclick();
 	});
 	
 	this.addMouseControl(0,function(x,y){
-		if(_this.pointIn(x,y)){
+		if(_this.pointIn(new Vec2(x,y))){
 			if(!_this.mouseIn){
 				_this.mouseIn = true;
 				_this.onmousein(x,y);

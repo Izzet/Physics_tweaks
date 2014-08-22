@@ -50,8 +50,8 @@
 		
 		var pr2 = new PhysicsRectangle({
 			position : new Vec2(0,0),
-			width : 100,
-			height : 100,
+			width : 500,
+			height : 10,
 			color : "#f00",
 			angularFriction : 0.5,
 			friction : new Vec2(0.5,0.5),
